@@ -60,12 +60,13 @@
 
 static NSString *JPRange = @"jprange";
 static NSString *JPColor = @"jpcolor";
+
 @implementation JPLabel
 
 #pragma mark --------------------------------------------------
 #pragma mark Publish
 
--(void)setHightLightTextColor:(UIColor *)hightLightColor forHandleStyle:(HandleStyle)handleStyle{
+- (void)setHightLightTextColor:(UIColor *)hightLightColor forHandleStyle:(HandleStyle)handleStyle{
     switch (handleStyle) {
         case HandleStyleLink:
         {
@@ -97,12 +98,7 @@ static NSString *JPColor = @"jpcolor";
     }
 }
 
--(void)setJp_commonTextColor:(UIColor *)jp_commonTextColor{
-    _jp_commonTextColor = jp_commonTextColor;
-    [self prepareText];
-}
-
--(void)setJp_matchArr:(NSArray<NSDictionary *> *)jp_matchArr{
+- (void)setJp_matchArr:(NSArray<NSDictionary *> *)jp_matchArr{
     _jp_matchArr = jp_matchArr;
     [self prepareText];
 }
@@ -110,23 +106,22 @@ static NSString *JPColor = @"jpcolor";
 
 #pragma mark --------------------------------------------------
 #pragma mark 重写系统的属性
-
--(void)setText:(NSString *)text{
+- (void)setText:(NSString *)text{
     [super setText:text];
     [self prepareText];
 }
 
--(void)setFont:(UIFont *)font{
+- (void)setFont:(UIFont *)font{
     [super setFont:font];
     [self prepareText];
 }
 
--(void)setTextColor:(UIColor *)textColor{
+- (void)setTextColor:(UIColor *)textColor{
     [super setTextColor:textColor];
     [self prepareText];
 }
 
--(instancetype)initWithFrame:(CGRect)frame{
+- (instancetype)initWithFrame:(CGRect)frame{
     self = [super initWithFrame:frame];
     if (self) {
         [self setup];
@@ -134,7 +129,7 @@ static NSString *JPColor = @"jpcolor";
     return self;
 }
 
--(instancetype)initWithCoder:(NSCoder *)aDecoder{
+- (instancetype)initWithCoder:(NSCoder *)aDecoder{
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self setup];
@@ -142,15 +137,12 @@ static NSString *JPColor = @"jpcolor";
     return self;
 }
 
--(void)setup{
-    
+- (void)setup{
     _textStorage = [NSTextStorage new];
     _layoutManager = [NSLayoutManager new];
     _textContainer = [NSTextContainer new];
-    _jp_commonTextColor = [UIColor colorWithRed:162.0/255 green:162.0/255  blue:162.0/255  alpha:162.0/255];
     _jp_textHightLightBackgroundColor = [UIColor colorWithWhite:0.7 alpha:0.2];
     _linkHightColor = _topicHightColor = _agreementHightColor = _userHightColor = [UIColor colorWithRed:64.0/255 green:64.0/255 blue:64.0/255 alpha:1];
-    
     [self prepareTextSystem];
 }
 
@@ -159,7 +151,7 @@ static NSString *JPColor = @"jpcolor";
 #pragma mark 系统回调
 
 // 布局子控件
--(void)layoutSubviews{
+- (void)layoutSubviews{
     [super layoutSubviews];
     
     // 设置容器的大小为Label的尺寸
@@ -168,7 +160,7 @@ static NSString *JPColor = @"jpcolor";
 
 
 // 重写drawTextInRect方法
--(void)drawRect:(CGRect)rect{
+- (void)drawRect:(CGRect)rect{
     
     // 不调用super就不会绘制原有文字
 //    [super drawRect:rect];
@@ -198,7 +190,7 @@ static NSString *JPColor = @"jpcolor";
 #pragma mark Private
 
 // 准备文本系统
--(void)prepareTextSystem{
+- (void)prepareTextSystem{
     // 0.准备文本
     [self prepareText];
     
@@ -216,8 +208,7 @@ static NSString *JPColor = @"jpcolor";
 }
 
 // 准备文本
--(void)prepareText{
-    
+- (void)prepareText{
     // 1.准备字符串
     NSAttributedString *attrString = nil;
     if (self.attributedText != nil) {
@@ -241,7 +232,7 @@ static NSString *JPColor = @"jpcolor";
     NSDictionary *attr;
     attr = @{
              NSFontAttributeName : self.font,
-             NSForegroundColorAttributeName : self.jp_commonTextColor
+             NSForegroundColorAttributeName : self.textColor
              };
 
     [attrStringM setAttributes:attr range:NSMakeRange(0, attrStringM.length)];
@@ -300,7 +291,6 @@ static NSString *JPColor = @"jpcolor";
             }
             self.userDefineRangesArr = [arrM copy];
         }
-        
     }
     
     // 10.更新显示，重新绘制
@@ -312,7 +302,7 @@ static NSString *JPColor = @"jpcolor";
 #pragma mark --------------------------------------------------
 #pragma mark 点击交互的封装
 
--(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     // 0.记录点击
     self.isSelected = YES;
     
@@ -328,8 +318,7 @@ static NSString *JPColor = @"jpcolor";
     }
 }
 
--(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     if (self.selectedRange.length == 0) {
         [super touchesEnded:touches withEvent:event];
         return;
@@ -413,7 +402,7 @@ static NSString *JPColor = @"jpcolor";
     
 }
 
--(NSRange)getSelectRange:(CGPoint)selectPoint{
+- (NSRange)getSelectRange:(CGPoint)selectPoint{
     // 0.如果属性字符串为nil,则不需要判断
     if (self.textStorage.length == 0) return NSMakeRange(0, 0);
     
@@ -484,18 +473,14 @@ static NSString *JPColor = @"jpcolor";
 #pragma mark 字符串匹配封装
 
 // 查找用户给定的字符串的range
--(NSArray<NSDictionary*> *)getUserDefineStringsRange{
-    
-    if (self.jp_matchArr.count == 0) return nil;
-    
+- (NSArray<NSDictionary*> *)getUserDefineStringsRange{
     NSMutableArray<NSDictionary*> *arrM = [NSMutableArray array];
-    
     NSString *str = [self.textStorage string];
     for (NSDictionary *dict in self.jp_matchArr) {
         NSString *subStr = dict[@"string"];
-        UIColor *color = dict[@"color"];
+        UIColor *color = dict[@"color"]?dict[@"color"]:self.textColor;
         // 没传入字符串
-        if (!subStr) return nil;
+        if (!subStr) return @[];
         
         NSRange range = [str rangeOfString:subStr];
         
@@ -512,7 +497,7 @@ static NSString *JPColor = @"jpcolor";
     return [arrM copy];
 }
 
--(NSArray *)getRanges:(NSString *)pattern{
+- (NSArray *)getRanges:(NSString *)pattern{
     
     // 创建正则表达式对象
     NSError *error;
@@ -521,14 +506,14 @@ static NSString *JPColor = @"jpcolor";
     return [self getRangesFromResult:regex];
 }
 
--(NSArray *)getLinkRanges{
+- (NSArray *)getLinkRanges{
      // 创建正则表达式
     NSError *error;
     NSDataDetector *detector = [NSDataDetector  dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
     return [self getRangesFromResult:detector];
 }
 
--(NSArray *)getRangesFromResult:(NSRegularExpression *)regex{
+- (NSArray *)getRangesFromResult:(NSRegularExpression *)regex{
     
     NSArray<NSTextCheckingResult *> *results = [regex matchesInString:[self.textStorage string] options:0 range:NSMakeRange(0, self.textStorage.length)];
     
@@ -551,7 +536,7 @@ static NSString *JPColor = @"jpcolor";
 #pragma mark Extesion
 
 // 如果用户没有设置lineBreak,则所有内容会绘制到同一行中,因此需要主动设置
--(NSMutableAttributedString *)addLineBreak:(NSAttributedString *)attrString{
+- (NSMutableAttributedString *)addLineBreak:(NSAttributedString *)attrString{
     
     NSMutableAttributedString *attrStringM = [attrString mutableCopy];
     
