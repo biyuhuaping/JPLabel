@@ -20,7 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
    
-    self.textLabel.text = @"#JPLabel# 用于匹配字符串的内容显示, 用户:@伊人, 包括话题:#怎么追漂亮女孩?#, 链接:https://github.com/biyuhuaping/JPLabel.git, 协议:《使用协议》, 还有自定义要高亮显示的字符串.";
+    self.textLabel.text = @"#JPLabel# 用于匹配字符串的内容显示, 用户:@伊人, 包括话题:#怎么追漂亮女孩?#, 链接:https://github.com/biyuhuaping/JPLabel.git, 协议:《使用协议》, 还有自定义要高亮显示的字符串.2020.12.12日又添加了下划线的功能";
 
     // 点选高亮文字颜色
     self.textLabel.jp_textHightLightBackgroundColor = [UIColor colorWithRed:237.0/255 green:213.0/255 blue:177.0/255 alpha:1];
@@ -34,17 +34,20 @@
     // 自定义匹配的文字和颜色#8FDF5C
     self.textLabel.jp_matchArr = @[
                                    @{
-                                       @"string" : @"高亮显示",
-                                       @"color" : [UIColor redColor]
+                                       JPString : @"高亮显示",
+                                       JPColor : [UIColor redColor],
+                                       JPFont : [UIFont systemFontOfSize:10],
+                                       JPLine1 : @(NSUnderlineStyleSingle)
                                        },
                                    @{
-                                       @"string" : @"字符串.",
-                                       @"color" : [UIColor greenColor],
+                                       JPString : @"字符串.",
+                                       JPColor : [UIColor greenColor],
+                                       JPLine2 : @(NSUnderlineStyleSingle)
                                        }
                                    ];
     
     // 匹配到合适内容的回调
-    self.textLabel.jp_tapOperation = ^(UILabel *label, HandleStyle style, NSString *selectedString, NSRange range){
+    self.textLabel.jp_tapBlock = ^(UILabel *label, HandleStyle style, NSString *selectedString, NSRange range){
         // 你想要做的事
         NSLog(@"block打印 %@", selectedString);
         if (style == HandleStyleLink) {

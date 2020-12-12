@@ -57,15 +57,11 @@
 
 @end
 
-
-static NSString *JPRange = @"jprange";
-static NSString *JPColor = @"jpcolor";
+static NSString *JPRange = @"range";
 
 @implementation JPLabel
 
-#pragma mark --------------------------------------------------
-#pragma mark Publish
-
+#pragma mark - Publish-------------------------------------------------
 - (void)setHightLightTextColor:(UIColor *)hightLightColor forHandleStyle:(HandleStyle)handleStyle{
     switch (handleStyle) {
         case HandleStyleLink:
@@ -104,8 +100,7 @@ static NSString *JPColor = @"jpcolor";
 }
 
 
-#pragma mark --------------------------------------------------
-#pragma mark 重写系统的属性
+#pragma mark - 重写系统的属性-------------------------------------------------
 - (void)setText:(NSString *)text{
     [super setText:text];
     [self prepareText];
@@ -147,9 +142,7 @@ static NSString *JPColor = @"jpcolor";
 }
 
 
-#pragma mark --------------------------------------------------
-#pragma mark 系统回调
-
+#pragma mark - 系统回调-------------------------------------------------
 // 布局子控件
 - (void)layoutSubviews{
     [super layoutSubviews];
@@ -186,9 +179,7 @@ static NSString *JPColor = @"jpcolor";
 
 
 
-#pragma mark --------------------------------------------------
-#pragma mark Private
-
+#pragma mark - Private-------------------------------------------------
 // 准备文本系统
 - (void)prepareTextSystem{
     // 0.准备文本
@@ -213,11 +204,9 @@ static NSString *JPColor = @"jpcolor";
     NSAttributedString *attrString = nil;
     if (self.attributedText != nil) {
         attrString = self.attributedText;
-    }
-    else if (self.text != nil){
+    } else if (self.text != nil){
         attrString = [[NSAttributedString alloc]initWithString:self.text];
-    }
-    else{
+    } else{
         attrString = [[NSAttributedString alloc]initWithString:@""];
     }
     
@@ -284,10 +273,17 @@ static NSString *JPColor = @"jpcolor";
             for (NSDictionary *dict in userDefineRangeDicts) {
                 NSValue *value = dict[JPRange];
                 [arrM addObject:value];
-                UIColor *color = dict[JPColor];
+                
                 NSRange range;
                 [value getValue:&range];
-                [self.textStorage addAttribute:NSForegroundColorAttributeName value:color range:range];
+                
+                NSMutableDictionary *dic = [NSMutableDictionary new];
+                dic[NSForegroundColorAttributeName] = dict[JPColor];
+                dic[NSFontAttributeName] = dict[JPFont];
+                dic[NSStrikethroughStyleAttributeName] = dict[JPLine1];//@(NSUnderlineStyleSingle);//添加中划线
+                dic[NSUnderlineStyleAttributeName] = dict[JPLine2];//@(NSUnderlineStyleSingle);//添加下划线
+                
+                [self.textStorage addAttributes:dic range:range];
             }
             self.userDefineRangesArr = [arrM copy];
         }
@@ -299,9 +295,7 @@ static NSString *JPColor = @"jpcolor";
 
 
 
-#pragma mark --------------------------------------------------
-#pragma mark 点击交互的封装
-
+#pragma mark - 点击交互的封装-------------------------------------------------
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     // 0.记录点击
     self.isSelected = YES;
@@ -337,55 +331,55 @@ static NSString *JPColor = @"jpcolor";
     switch (self.tapStyle) {
         case HandleStyleAgreement:{
             __weak typeof(self) weakSelf = self;
-            if (self.jp_tapOperation) {
+            if (self.jp_tapBlock) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) return;
-                if (strongSelf.jp_tapOperation) {
-                    strongSelf.jp_tapOperation(strongSelf, HandleStyleAgreement, selectedString, strongSelf.selectedRange);
+                if (strongSelf.jp_tapBlock) {
+                    strongSelf.jp_tapBlock(strongSelf, HandleStyleAgreement, selectedString, strongSelf.selectedRange);
                 }
             }
         }
             break;
         case HandleStyleLink:{
             __weak typeof(self) weakSelf = self;
-            if (self.jp_tapOperation) {
+            if (self.jp_tapBlock) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) return;
-                if (strongSelf.jp_tapOperation) {
-                    strongSelf.jp_tapOperation(strongSelf, HandleStyleLink, selectedString, strongSelf.selectedRange);
+                if (strongSelf.jp_tapBlock) {
+                    strongSelf.jp_tapBlock(strongSelf, HandleStyleLink, selectedString, strongSelf.selectedRange);
                 }
             }
         }
             break;
         case HandleStyleTopic:{
             __weak typeof(self) weakSelf = self;
-            if (self.jp_tapOperation) {
+            if (self.jp_tapBlock) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) return;
-                if (strongSelf.jp_tapOperation) {
-                    strongSelf.jp_tapOperation(strongSelf, HandleStyleTopic, selectedString, strongSelf.selectedRange);
+                if (strongSelf.jp_tapBlock) {
+                    strongSelf.jp_tapBlock(strongSelf, HandleStyleTopic, selectedString, strongSelf.selectedRange);
                 }
             }
         }
             break;
         case HandleStyleUser:{
             __weak typeof(self) weakSelf = self;
-            if (self.jp_tapOperation) {
+            if (self.jp_tapBlock) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) return;
-                if (strongSelf.jp_tapOperation) {
-                    strongSelf.jp_tapOperation(strongSelf, HandleStyleUser, selectedString, strongSelf.selectedRange);
+                if (strongSelf.jp_tapBlock) {
+                    strongSelf.jp_tapBlock(strongSelf, HandleStyleUser, selectedString, strongSelf.selectedRange);
                 }
             }
         }
             break;
         case HandleStyleUserDefine:{
             __weak typeof(self) weakSelf = self;
-            if (self.jp_tapOperation) {
+            if (self.jp_tapBlock) {
                 __strong typeof(weakSelf) strongSelf = weakSelf;
                 if (!strongSelf) return;
-                if (strongSelf.jp_tapOperation) {
-                    strongSelf.jp_tapOperation(strongSelf, HandleStyleUserDefine, selectedString, strongSelf.selectedRange);
+                if (strongSelf.jp_tapBlock) {
+                    strongSelf.jp_tapBlock(strongSelf, HandleStyleUserDefine, selectedString, strongSelf.selectedRange);
                 }
             }
         }
@@ -399,7 +393,6 @@ static NSString *JPColor = @"jpcolor";
     if ([self.delegate respondsToSelector:@selector(jp_label:didSelectedString:forStyle:inRange:)]) {
         [self.delegate jp_label:self didSelectedString:selectedString forStyle:self.tapStyle inRange:self.selectedRange];
     }
-    
 }
 
 - (NSRange)getSelectRange:(CGPoint)selectPoint{
@@ -469,16 +462,15 @@ static NSString *JPColor = @"jpcolor";
 }
 
 
-#pragma mark --------------------------------------------------
-#pragma mark 字符串匹配封装
-
+#pragma mark - 字符串匹配封装-------------------------------------------------
 // 查找用户给定的字符串的range
 - (NSArray<NSDictionary*> *)getUserDefineStringsRange{
     NSMutableArray<NSDictionary*> *arrM = [NSMutableArray array];
     NSString *str = [self.textStorage string];
     for (NSDictionary *dict in self.jp_matchArr) {
-        NSString *subStr = dict[@"string"];
-        UIColor *color = dict[@"color"]?dict[@"color"]:self.textColor;
+        NSString *subStr = dict[JPString];
+        UIColor *color = dict[JPColor]?dict[JPColor]:self.textColor;
+        UIColor *font = dict[JPFont]?dict[JPFont]:self.font;
         // 没传入字符串
         if (!subStr) return @[];
         
@@ -491,6 +483,9 @@ static NSString *JPColor = @"jpcolor";
         NSMutableDictionary *aDictM = [NSMutableDictionary dictionary];
         aDictM[JPRange] = value;
         aDictM[JPColor] = color;
+        aDictM[JPFont] = font;
+        aDictM[JPLine1] = dict[JPLine1];
+        aDictM[JPLine2] = dict[JPLine2];
         [arrM addObject:[aDictM copy]];
     }
     
@@ -532,9 +527,7 @@ static NSString *JPColor = @"jpcolor";
 }
 
 
-#pragma mark --------------------------------------------------
-#pragma mark Extesion
-
+#pragma mark - Extesion-------------------------------------------------
 // 如果用户没有设置lineBreak,则所有内容会绘制到同一行中,因此需要主动设置
 - (NSMutableAttributedString *)addLineBreak:(NSAttributedString *)attrString{
     
@@ -548,12 +541,10 @@ static NSString *JPColor = @"jpcolor";
     
     if (paragraphStyle != nil) {
         paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-    }
-    else{
+    } else{
         paragraphStyle = [NSMutableParagraphStyle new];
         paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
         attributes[NSParagraphStyleAttributeName] = paragraphStyle;
-        
         [attrStringM setAttributes:attributes range:range];
     }
     
